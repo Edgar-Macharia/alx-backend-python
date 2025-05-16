@@ -23,7 +23,7 @@ def paginate_users(page_size: int, offset: int) -> List[Dict]:
         cursor = connection.cursor(dictionary=True)
         
         cursor.execute(
-            "SELECT user_id, name, email, age FROM user_data LIMIT %s OFFSET %s",
+            "SELECT * FROM user_data LIMIT %s OFFSET %s",
             (page_size, offset)
         )
         
