@@ -1,7 +1,7 @@
 import sqlite3
 import os
 
-def create_database(db_path="test.db"):
+def create_database(db_path="users.db"):
     # Check if database file exists
     db_exists = os.path.exists(db_path)
     
