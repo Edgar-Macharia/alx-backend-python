@@ -22,7 +22,7 @@ def create_users_table(cursor):
         password_hash TEXT NOT NULL,
         first_name TEXT,
         last_name TEXT,
-        date_of_birth DATE,
+        age INTEGER,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         is_active BOOLEAN DEFAULT TRUE,
@@ -34,14 +34,16 @@ def create_users_table(cursor):
 def insert_test_users(cursor):
 
     test_users = [
-        ('testuser1', 'test1@example.com', 'hashed_password1', 'John', 'Doe', '1990-01-01', True, 'user'),
-        ('testuser2', 'test2@example.com', 'hashed_password2', 'Jane', 'Smith', '1992-05-15', True, 'admin'),
-        ('testuser3', 'test3@example.com', 'hashed_password3', 'Bob', 'Johnson', '1985-12-10', False, 'user'),
+        ('testuser1', 'test1@example.com', 'hashed_password1', 'John', 'Doe', 42, True, 'user'),
+        ('testuser2', 'test2@example.com', 'hashed_password2', 'Jane', 'Smith', 30, True, 'admin'),
+        ('testuser3', 'test3@example.com', 'hashed_password3', 'Bob', 'Johnson', 50, False, 'user'),
+        ('testuser4', 'test4@example.com', 'hashed_password4', 'Eve', 'Davis', 50, False, 'user'),
+        ('testuser5', 'test5@example.com', 'hashed_password5', 'Diana', 'Wilson', 22, False, 'user'),
     ]
     
     cursor.executemany('''
     INSERT OR IGNORE INTO users 
-    (username, email, password_hash, first_name, last_name, date_of_birth, is_active, role) 
+    (username, email, password_hash, first_name, last_name, age, is_active, role) 
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     ''', test_users)
     
