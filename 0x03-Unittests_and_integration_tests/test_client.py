@@ -119,6 +119,30 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
 
         self.mock_get.assert_any_call("https://api.github.com/orgs/google")
         self.mock_get.assert_any_call(self.org_payload["repos_url"])
+        
+        
+    @classmethod
+    def tearDownClass(cls):
+        """Tear down class method to stop the patcher."""
+        cls.get_patcher.stop()
+
+    def test_public_repos(self):
+        """Integration test for public_repos method."""
+        client = GithubOrgClient("google")
+        result = client.public_repos()
+        self.assertEqual(result, self.expected_repos)
+
+        self.mock_get.assert_any_call("https://api.github.com/orgs/google")
+        self.mock_get.assert_any_call(self.org_payload["repos_url"])
+
+    def test_public_repos_with_license(self):
+        """Integration test for public_repos method with license filter."""
+        client = GithubOrgClient("google")
+        result = client.public_repos(license="apache-2.0")
+        self.assertEqual(result, self.apache2_repos)
+
+        self.mock_get.assert_any_call("https://api.github.com/orgs/google")
+        self.mock_get.assert_any_call(self.org_payload["repos_url"])
 
 
 if __name__ == "__main__":
