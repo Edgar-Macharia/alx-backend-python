@@ -28,8 +28,7 @@ class TestGithubOrgClient(unittest.TestCase):
 
     def test_public_repos_url(self) -> None:
         """Test that GithubOrgClient returns the expected repos URL."""
-        test_payload = {"repos_url":
-            "https://api.github.com/orgs/testorg/repos"}
+        test_payload = {"repos_url":"https://api.github.com/orgs/testorg/repos"}
         with patch.object(GithubOrgClient, 'org', 
                           new_callable=PropertyMock) as mock_org:
             mock_org.return_value = test_payload
@@ -125,7 +124,6 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
         self.mock_get.assert_any_call("https://api.github.com/orgs/google")
         self.mock_get.assert_any_call(self.org_payload["repos_url"])
 
-
     @classmethod
     def tearDownClass(cls):
         """Tear down class method to stop the patcher."""
@@ -152,4 +150,3 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-    
