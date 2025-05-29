@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import unittest
-from unittest.mock import patch, PropertyMock
-from parameterized import parameterized
+from unittest.mock import patch, PropertyMock, Mock
+from parameterized import parameterized, parameterized_class
 from typing import Dict
 from client import GithubOrgClient
 from fixtures import TEST_PAYLOAD
@@ -64,3 +64,62 @@ class TestGithubOrgClient(unittest.TestCase):
         result = client.has_license(repo, license_key)
         self.assertEqual(result, expected)
             
+
+@parameterized_class([
+    {
+        "org_payload": TEST_PAYLOAD[0][0],
+        "repos_payload": TEST_PAYLOAD[0][1],
+        "expected_repos": TEST_PAYLOAD[0][2],
+        "apache2_repos": TEST_PAYLOAD[0][3]
+    }
+])
+class TestIntegrationGithubOrgClient(unittest.TestCase):
+    """Integration test class for GithubOrgClient."""
+
+    @classmethod
+    def setUpClass(cls):
+        """Set up class method to start patcher for requests.get."""
+        def side_effect(url):
+            """
+            Side effect function to return appropriate payload
+            based on URL."""
+            mock_response = Mock()
+
+            if url == "https://api.github.com/orgs/google":
+                mock_response.json.return_value = cls.org_payload
+            elif url == cls.org_payload["repos_url"]:
+                mock_response.json.return_value = cls.repos_payload
+            else:
+                mock_response.json.return_value = {}
+
+            return mock_response
+
+        cls.get_patcher = patch('requests.get', side_effect=side_effect)
+        cls.mock_get = cls.get_patcher.start()
+
+    @classmethod
+    def tearDownClass(cls):
+        """Tear down class method to stop the patcher."""
+        cls.get_patcher.stop()
+
+    def test_public_repos(self):
+        """Integration test for public_repos method."""
+        client = GithubOrgClient("google")
+        result = client.public_repos()
+        self.assertEqual(result, self.expected_repos)
+
+        self.mock_get.assert_any_call("https://api.github.com/orgs/google")
+        self.mock_get.assert_any_call(self.org_payload["repos_url"])
+
+    def test_public_repos_with_license(self):
+        """Integration test for public_repos method with license filter."""
+        client = GithubOrgClient("google")
+        result = client.public_repos(license="apache-2.0")
+        self.assertEqual(result, self.apache2_repos)
+
+        self.mock_get.assert_any_call("https://api.github.com/orgs/google")
+        self.mock_get.assert_any_call(self.org_payload["repos_url"])
+
+
+if __name__ == "__main__":
+    unittest.main()
